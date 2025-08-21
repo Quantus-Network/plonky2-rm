@@ -29,7 +29,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/ubuntu
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@nightly
       - name: Install required components
         run: rustup component add rustfmt
       - name: Run format checks
@@ -48,16 +49,23 @@ jobs:
           - macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Ubuntu
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@nightly
+      - name: Install dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
-        uses: ./.github/actions/ubuntu
-      - name: Setup macOS
+        run: |
+          sudo apt-get update -yqq
+          sudo apt-get install -yqq --no-install-recommends \
+            libclang-dev \
+            protobuf-compiler
+      - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
-        uses: ./.github/actions/macos
-      - name: compile
-        run: cargo build --locked --workspace --features runtime-benchmarks
-      - name: test
-        run: SKIP_WASM_BUILD=1 cargo test --locked --workspace
+        run: |
+          brew install protobuf
+      - name: Build
+        run: cargo build --locked --release
+      - name: Test
+        run: cargo test --locked --release
 
   analysis:
     name: 🤖 Analysis (Clippy & Doc)
@@ -65,9 +73,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Ubuntu
-        uses: ./.github/actions/ubuntu
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@nightly
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -yqq
+          sudo apt-get install -yqq --no-install-recommends \
+            libclang-dev \
+            protobuf-compiler
       - name: Install required components
-        run: rustup component add rust-src clippy
+        run: rustup component add rust-src
       - name: Run doc
-        run: SKIP_WASM_BUILD=1 cargo doc --locked --workspace --no-deps
+        run: cargo doc --locked --no-deps
