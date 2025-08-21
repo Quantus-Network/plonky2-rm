@@ -132,7 +132,7 @@ impl<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: usize>
     fn lde_blinded_values(
         polynomials: &[PolynomialCoeffs<F>],
         rate_bits: usize,
-        fft_root_table: Option<&FftRootTable<F>>
+        fft_root_table: Option<&FftRootTable<F>>,
     ) -> Vec<Vec<F>> {
         let degree = polynomials[0].len();
 
@@ -155,7 +155,7 @@ impl<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: usize>
     fn lde_unblinded_values(
         polynomials: &[PolynomialCoeffs<F>],
         rate_bits: usize,
-        fft_root_table: Option<&FftRootTable<F>>
+        fft_root_table: Option<&FftRootTable<F>>,
     ) -> Vec<Vec<F>> {
         let degree = polynomials[0].len();
 

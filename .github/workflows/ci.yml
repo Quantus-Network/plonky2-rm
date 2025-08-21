@@ -1,0 +1,73 @@
+---
+name: Continuous Integration
+
+on:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - "LICENSE"
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - "LICENSE"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fast-checks:
+    name: 🏁 Fast Checks (Format)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/ubuntu
+      - name: Install required components
+        run: rustup component add rustfmt
+      - name: Run format checks
+        run: |
+          cargo fmt --all -- --check
+
+  build-and-test-matrix:
+    name: 🛠️ Build & Test Matrix
+    needs: fast-checks
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        uses: ./.github/actions/ubuntu
+      - name: Setup macOS
+        if: matrix.os == 'macos-latest'
+        uses: ./.github/actions/macos
+      - name: compile
+        run: cargo build --locked --workspace --features runtime-benchmarks
+      - name: test
+        run: SKIP_WASM_BUILD=1 cargo test --locked --workspace
+
+  analysis:
+    name: 🤖 Analysis (Clippy & Doc)
+    needs: fast-checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Ubuntu
+        uses: ./.github/actions/ubuntu
+      - name: Install required components
+        run: rustup component add rust-src clippy
+      - name: Run doc
+        run: SKIP_WASM_BUILD=1 cargo doc --locked --workspace --no-deps
