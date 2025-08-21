@@ -68,7 +68,7 @@ jobs:
         run: cargo test --locked --release
 
   analysis:
-    name: 🤖 Analysis (Clippy & Doc)
+    name: 🤖 Analysis (Doc)
     needs: fast-checks
     runs-on: ubuntu-latest
     steps:
