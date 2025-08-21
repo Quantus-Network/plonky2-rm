@@ -121,8 +121,10 @@ impl<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: usize>
             #[cfg(not(feature = "no_random"))]
             return Self::lde_blinded_values(polynomials, rate_bits, fft_root_table);
             #[cfg(feature = "no_random")]
-            assert!(false, "Cannot set blinding with no_random feature");
-            [].into()
+            {
+                assert!(false, "Cannot set blinding with no_random feature");
+                [].into()
+            }
         } else {
             Self::lde_unblinded_values(polynomials, rate_bits, fft_root_table)
         }
