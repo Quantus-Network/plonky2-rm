@@ -16,19 +16,13 @@ keywords.workspace = true
 categories.workspace = true
 
 [features]
-default = [
-    "gate_testing",
-    "parallel",
-    "rand_chacha",
-    "timing",
-    "getrandom",
-    "plonky2_field/default",
-]
+default = ["gate_testing", "parallel", "rand_chacha", "timing", "getrandom"]
 gate_testing = []
 parallel = ["hashbrown/rayon", "plonky2_maybe_rayon/parallel"]
 std = ["anyhow/std", "rand/std", "itertools/use_std"]
 timing = ["std", "dep:web-time"]
 no_random = ["plonky2_field/no_random"]
+no_std = []
 
 [dependencies]
 ahash = { workspace = true }
@@ -46,7 +40,9 @@ unroll = { workspace = true }
 web-time = { version = "1.0.0", optional = true }
 
 # Local dependencies
-plonky2_field = { version = "1.0.0", path = "../field", default-features = false }
+plonky2_field = { version = "1.0.0", path = "../field", default-features = false, features = [
+    "rand",
+] }
 plonky2_maybe_rayon = { version = "1.0.0", path = "../maybe_rayon", default-features = false }
 plonky2_util = { version = "1.0.0", path = "../util", default-features = false }
 
