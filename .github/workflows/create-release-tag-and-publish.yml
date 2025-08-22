@@ -132,9 +132,11 @@ jobs:
 
       - name: Wait for quantus_plonky2_field to appear on crates.io
         shell: bash
+        env:
+          NEW_VERSION: ${{ needs.create-tag.outputs.version }}
         run: |
           set -e
-          FIELD_VERSION=$(sed -n -E 's/^version\s*=\s*"([^"]+)"/\1/p' field/Cargo.toml | head -1)
+          FIELD_VERSION=${NEW_VERSION#v}
           echo "Waiting for quantus_plonky2_field ${FIELD_VERSION} to be available..."
           for i in {1..30}; do
             if curl -fsS "https://crates.io/api/v1/crates/quantus_plonky2_field/${FIELD_VERSION}" > /dev/null; then
