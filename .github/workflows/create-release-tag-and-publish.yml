@@ -138,8 +138,9 @@ jobs:
           set -e
           FIELD_VERSION=${NEW_VERSION#v}
           echo "Waiting for quantus_plonky2_field ${FIELD_VERSION} to be available..."
+          UA="quantus-actions/${GITHUB_RUN_ID}"
           for i in {1..30}; do
-            if curl -fsS "https://crates.io/api/v1/crates/quantus_plonky2_field/${FIELD_VERSION}" > /dev/null; then
+            if curl -fsS -A "$UA" -o /dev/null "https://crates.io/crates/quantus_plonky2_field/${FIELD_VERSION}"; then
               echo "quantus_plonky2_field ${FIELD_VERSION} is available."
               break
             fi
