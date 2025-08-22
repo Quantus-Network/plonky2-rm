@@ -63,12 +63,12 @@ impl<F: Field> TryFrom<&[F]> for HashOut<F> {
     }
 }
 
+#[cfg(not(feature = "no_random"))]
 impl<F> Sample for HashOut<F>
 where
     F: Field,
 {
     #[inline]
-    #[cfg(not(feature = "no_random"))]
     fn sample<R>(rng: &mut R) -> Self
     where
         R: rand::RngCore + ?Sized,
@@ -161,9 +161,9 @@ pub struct MerkleCapTarget(pub Vec<HashOutTarget>);
 #[derive(Eq, PartialEq, Copy, Clone, Debug)]
 pub struct BytesHash<const N: usize>(pub [u8; N]);
 
+#[cfg(not(feature = "no_random"))]
 impl<const N: usize> Sample for BytesHash<N> {
     #[inline]
-    #[cfg(not(feature = "no_random"))]
     fn sample<R>(rng: &mut R) -> Self
     where
         R: rand::RngCore + ?Sized,
