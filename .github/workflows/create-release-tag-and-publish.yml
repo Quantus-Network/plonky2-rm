@@ -139,12 +139,27 @@ jobs:
           FIELD_VERSION=${NEW_VERSION#v}
           echo "Waiting for quantus_plonky2_field ${FIELD_VERSION} to be available..."
           UA="quantus-actions/${GITHUB_RUN_ID}"
-          for i in {1..30}; do
-            if curl -fsS -A "$UA" -o /dev/null "https://crates.io/crates/quantus_plonky2_field/${FIELD_VERSION}"; then
+          check_available() {
+            # 1) JSON endpoint for the exact version
+            if curl -fsSL -A "$UA" -H "Accept: application/json" \
+                 "https://crates.io/api/v1/crates/quantus_plonky2_field/${FIELD_VERSION}" \
+                 | grep -q '"crate"'; then
+              return 0
+            fi
+            # 2) HTML page for the exact version
+            if curl -fsSIL -A "$UA" "https://crates.io/crates/quantus_plonky2_field/${FIELD_VERSION}" \
+                 | grep -q "^HTTP/.* 200"; then
+              return 0
+            fi
+            return 1
+          }
+
+          for i in {1..60}; do
+            if check_available; then
               echo "quantus_plonky2_field ${FIELD_VERSION} is available."
               break
             fi
-            echo "Not yet available, retry $i/30..."; sleep 10
+            echo "Not yet available, retry $i/60..."; sleep 5
           done
 
       - name: Publish quantus_plonky2 to crates.io
