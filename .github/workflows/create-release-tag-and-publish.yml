@@ -119,7 +119,7 @@ jobs:
 
           gh release create "$NEW_VERSION" \
             --repo "$GITHUB_REPOSITORY" \
-            --title "Quantus libraries $NEW_VERSION" \
+            --title "Quantus plonky2 - $NEW_VERSION" \
             --notes-file release_notes.txt \
             --target main \
             $DRAFT_FLAG
